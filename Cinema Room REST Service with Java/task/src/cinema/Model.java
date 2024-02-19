@@ -2,38 +2,52 @@ package cinema;
 
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class Model {
+    private final Map<Seat, Boolean> seats;
+
     private final int rows;
     private final int columns;
-    private final List<Seat> seats;
-
     public Model() {
         rows = 9;
         columns = 9;
-        seats = new ArrayList<>();
+        seats = new ConcurrentHashMap<>();
         for (int j = 1; j <= rows; j++) {
             for (int i = 1; i <= columns; i++) {
-                seats.add(new Seat(j, i));
+                seats.put(new Seat(j, i), true);
             }
         }
     }
 
-    @SuppressWarnings("unused")
+    Cinema getCinema() {
+        List<Seat> freeSeats = new ArrayList<>();
+        seats.forEach((seat, isFree) -> {
+            if (isFree) freeSeats.add(seat);
+        });
+        Collections.sort(freeSeats);
+        return new Cinema(rows, columns, freeSeats);
+    }
+
+    Seat purchaseSeat(Seat requestSeat) {
+        for (Map.Entry<Seat, Boolean> entry : seats.entrySet()) {
+            Seat seat = entry.getKey();
+            Boolean isFree = entry.getValue();
+            if (Objects.equals(seat, requestSeat) && isFree) {
+                seats.put(seat, false);
+                return seat;
+            }
+        }
+        return null;
+    }
+
     public int getRows() {
         return rows;
     }
 
-    @SuppressWarnings("unused")
     public int getColumns() {
         return columns;
-    }
-
-    @SuppressWarnings("unused")
-    public List<Seat> getSeats() {
-        return seats;
     }
 }
