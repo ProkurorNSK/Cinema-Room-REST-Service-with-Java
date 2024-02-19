@@ -3,12 +3,10 @@ package cinema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
@@ -28,14 +26,21 @@ public class SeatsController {
     @PostMapping("/purchase")
     private ResponseEntity<Seat> purchaseSeat(@RequestBody Seat seat) {
         if (seat.getRow() < 1 || seat.getRow() > model.getRows() || seat.getColumn() < 1 || seat.getColumn() > model.getColumns()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The number of a row or a column is out of bounds!");
+            throw new PurchaseTicketErrorException("The number of a row or a column is out of bounds!");
         }
 
         Seat result = model.purchaseSeat(seat);
         if (Objects.isNull(result)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The ticket has been already purchased!");
+            throw new PurchaseTicketErrorException("The ticket has been already purchased!");
         } else {
             return ResponseEntity.ok(result);
         }
+    }
+
+    @ExceptionHandler(PurchaseTicketErrorException.class)
+    ResponseEntity<Object> handleTicketException(PurchaseTicketErrorException ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }

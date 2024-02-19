@@ -59,7 +59,7 @@ class Seat implements Comparable<Seat>{
         } else if (row == o.getRow()) {
             if (column > o.getColumn()) {
                 return 1;
-            } else if (row == o.getColumn()) {
+            } else if (column == o.getColumn()) {
                 return 0;
             }else {
                 return -1;
