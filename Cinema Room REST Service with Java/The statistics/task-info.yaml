@@ -538,6 +538,178 @@ files:
           };
       }
     learner_created: false
+  - name: src/cinema/Seat.java
+    visible: true
+    text: |
+      package cinema;
+      
+      @SuppressWarnings("unused")
+      class Seat implements Comparable<Seat>{
+          private int row, column, price;
+      
+          public Seat(int row, int column) {
+              this.row = row;
+              this.column = column;
+              price = row < 5 ? 10 : 8;
+          }
+      
+          public int getRow() {
+              return row;
+          }
+      
+          public void setRow(int row) {
+              this.row = row;
+          }
+      
+          public int getColumn() {
+              return column;
+          }
+      
+          public void setColumn(int column) {
+              this.column = column;
+          }
+      
+          public int getPrice() {
+              return price;
+          }
+      
+          public void setPrice(int price) {
+              this.price = price;
+          }
+      
+          @Override
+          public boolean equals(Object o) {
+              if (this == o) return true;
+              if (!(o instanceof Seat seat)) return false;
+      
+              if (row != seat.row) return false;
+              if (column != seat.column) return false;
+              return price == seat.price;
+          }
+      
+          @Override
+          public int hashCode() {
+              int result = row;
+              result = 31 * result + column;
+              result = 31 * result + price;
+              return result;
+          }
+      
+          @Override
+          public int compareTo(Seat o) {
+              if (row > o.getRow()) {
+                  return 1;
+              } else if (row == o.getRow()) {
+                  if (column > o.getColumn()) {
+                      return 1;
+                  } else if (column == o.getColumn()) {
+                      return 0;
+                  }else {
+                      return -1;
+                  }
+              }else {
+                  return -1;
+              }
+          }
+      }
+    learner_created: true
+  - name: src/cinema/Ticket.java
+    visible: true
+    text: |
+      package cinema;
+      
+      record Ticket(String token, Seat ticket) {
+      }
+    learner_created: true
+  - name: src/cinema/Cinema.java
+    visible: true
+    text: |-
+      package cinema;
+      
+      import java.util.List;
+      
+      record Cinema(int rows, int columns, List<Seat> seats) {
+      }
+    learner_created: true
+  - name: src/cinema/SeatsController.java
+    visible: true
+    text: |
+      package cinema;
+      
+      import org.springframework.beans.factory.annotation.Autowired;
+      import org.springframework.http.HttpStatus;
+      import org.springframework.http.ResponseEntity;
+      import org.springframework.web.bind.annotation.*;
+      
+      import java.util.Map;
+      import java.util.Objects;
+      
+      @SuppressWarnings("unused")
+      @RestController
+      public class SeatsController {
+          private final Model model;
+      
+          @Autowired
+          private SeatsController(Model model) {
+              this.model = model;
+          }
+      
+          @GetMapping("/seats")
+          private Cinema getSeats() {
+              return model.getCinema();
+          }
+      
+          @PostMapping("/purchase")
+          private ResponseEntity<Ticket> purchaseSeat(@RequestBody Seat seat) {
+              if (seat.getRow() < 1 || seat.getRow() > model.getRows() || seat.getColumn() < 1 || seat.getColumn() > model.getColumns()) {
+                  throw new PurchaseTicketErrorException("The number of a row or a column is out of bounds!");
+              }
+      
+              Ticket result = model.purchaseSeat(seat);
+              if (Objects.isNull(result)) {
+                  throw new PurchaseTicketErrorException("The ticket has been already purchased!");
+              } else {
+                  return ResponseEntity.ok(result);
+              }
+          }
+      
+          @PostMapping("/return")
+          private ResponseEntity<Object> returnSeat(@RequestBody Ticket token) {
+              Seat result = model.returnSeat(token.token());
+              if (Objects.isNull(result)) {
+                  throw new PurchaseTicketErrorException("Wrong token!");
+              } else {
+                  return ResponseEntity.ok(Map.of("ticket", result));
+              }
+          }
+      
+          @ExceptionHandler(PurchaseTicketErrorException.class)
+          ResponseEntity<Object> handleTicketException(PurchaseTicketErrorException ex) {
+              return new ResponseEntity<>(Map.of("error", ex.getMessage()), HttpStatus.BAD_REQUEST);
+          }
+      
+      
+      }
+    learner_created: true
+  - name: src/cinema/PurchaseTicketErrorException.java
+    visible: true
+    text: |
+      package cinema;
+      
+      import org.springframework.http.HttpStatus;
+      import org.springframework.web.bind.annotation.ResponseStatus;
+      
+      @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+      public class PurchaseTicketErrorException extends RuntimeException{
+          public PurchaseTicketErrorException(String message) {
+              super(message);
+          }
+      }
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/13378#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">Hyperskill</a>
+    to continue learning.
+  time: "Tue, 20 Feb 2024 14:14:29 UTC"
 record: -1

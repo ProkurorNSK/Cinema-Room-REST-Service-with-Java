@@ -3,9 +3,16 @@ package cinema;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+@ResponseStatus()
 public class PurchaseTicketErrorException extends RuntimeException{
-    public PurchaseTicketErrorException(String message) {
+    private final HttpStatus httpStatus;
+
+    public PurchaseTicketErrorException(String message, HttpStatus httpStatus) {
         super(message);
+        this.httpStatus = httpStatus;
+    }
+
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
     }
 }

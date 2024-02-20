@@ -24,6 +24,14 @@ public class Model {
         }
     }
 
+    public Map<String, Integer> getStats() {
+        int purchased = tokens.size();
+        int available = rows * columns - purchased;
+        int income = tokens.values().stream().mapToInt(Seat::getPrice).sum();
+
+        return Map.of("income", income, "available", available, "purchased", purchased);
+    }
+
     Cinema getCinema() {
         List<Seat> freeSeats = new ArrayList<>();
         seats.forEach((seat, isFree) -> {
