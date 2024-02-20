@@ -51,6 +51,7 @@ public class Model {
         Seat seat = tokens.get(token);
         if (!Objects.isNull(seat)) {
             seats.put(seat, true);
+            tokens.remove(token);
         }
         return seat;
     }

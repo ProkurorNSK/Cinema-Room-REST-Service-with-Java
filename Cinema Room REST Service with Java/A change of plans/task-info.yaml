@@ -598,18 +598,8 @@ files:
     visible: true
     learner_created: true
 feedback_link: https://hyperskill.org/learn/step/13377#comment
-status: Failed
+status: Solved
 feedback:
-  message: |-
-    Wrong answer in test #6
-
-    The JSON object shouldn&#39;t have the key &quot;row&quot;
-
-    Full JSON:
-    {
-      &quot;row&quot;: 2,
-      &quot;column&quot;: 5,
-      &quot;price&quot;: 10
-    }
-  time: "Tue, 20 Feb 2024 13:03:20 UTC"
+  message: Congratulations!
+  time: "Tue, 20 Feb 2024 13:11:39 UTC"
 record: 3
